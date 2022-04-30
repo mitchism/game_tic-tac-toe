@@ -1,6 +1,5 @@
 from IPython.display import clear_output
 import random
-#from random import randint
 
 
 # clear output w/ cross-IDLE compatibility

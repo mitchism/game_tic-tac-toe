@@ -1,5 +1,4 @@
-#from IPython.display import clear_output
-#from random import randint
+
 from game_functions import clear_output_new,display_board,display_score,intro_players,choose_first,player_input,space_check,player_choice,place_marker,full_board_check,win_check,replay
 
 print('Welcome to Tic Tac Toe!')
