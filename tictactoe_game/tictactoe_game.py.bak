@@ -1,4 +1,3 @@
-#(BRANCH new-single-player-feature) script version b-1 
 from game_functions import clear_output_new,display_board,display_score,intro_players
 from game_functions import choose_first,player_input,space_check,player_choice,place_marker
 from game_functions import full_board_check,win_check,replay,determine_victor
