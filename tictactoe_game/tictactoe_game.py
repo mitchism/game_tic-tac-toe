@@ -3,11 +3,6 @@ from game_functions import choose_first,player_input,space_check,player_choice,p
 from game_functions import full_board_check,win_check,replay,determine_victor
 from game_functions import computer_choice
 
-
-
-#from game_functions import clear_output_new,display_board,display_score,intro_players,choose_first,player_input,space_check,player_choice,place_marker,full_board_check,win_check,replay,determine_victor
-#computer_choice
-
 print('Welcome to Tic Tac Toe!')
 
 # ____ Load the defaults _____
