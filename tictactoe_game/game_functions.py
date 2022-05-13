@@ -1,7 +1,6 @@
 from IPython.display import clear_output
 import random
 
-
 # clear output w/ cross-IDLE compatibility
 def clear_output_new():
     '''     
@@ -25,7 +24,6 @@ def display_board(board):
     print("\t||-----------||")
     print(f"\t|| {board[7]} | {board[8]} | {board[9]} ||\n")
     
-
 def display_score(player1,player2):
     print(f"\t SCORE: \n\t - {player1['name']}: {player1['score']}\n\t - {player2['name']}: {player2['score']}\n")
 
@@ -40,13 +38,45 @@ def intro_players():
     > while not (marker1 == 'X' or marker1 == 'O')
     >     marker1 = input(...)   etc.
     '''
-    name1 = input("To Player A: please enter your name")
-    name2 = input("To Player B: please enter your name")
+    num_players = 'unknown'
+    num_confirm = False
+
+    while num_players.isdigit() == False or num_confirm == False:
+        
+        num_players = input("Will this be game have 1 player or 2? (Please enter 1 or 2)\t")
+        
+        if num_players.isdigit() == False:
+            print(f"Requires integer, {num_players} is not an integer.")
+            continue
+            
+        # if integer, give chance to change answer.
+        elif num_players.isdigit() == True:
+            confirm = input(f"You've chosen a {num_players} player game. \n\t Please confirm? (y or n)")
+            #confirm = 'y'  #temporary, to avoid confirmation screen
+            if confirm == 'n':
+                print("Enter another number (1 or 2)")
+                continue
+            else:
+                print(f"\n\tYou have selected: {num_players}.")
+                num_confirm = True    # CRITERIA #2 TO ESCAPE LOOP
+                break
     
-    marker1 = input(f"To {name1}: What is your marker symbol?")
-    marker2 = input(f"To {name2}: What is your marker symbol?")
-    # _______________
-    return name1,name2,marker1,marker2
+    name1 = input("To Player A: please enter your name")
+    markerchoices = ['X','O']
+    marker1 = '?'
+    while marker1 not in markerchoices:
+        marker1 = input(f"To {name1}: What is your marker symbol? (Choose X or O)")
+        if marker1 in markerchoices:
+            markerchoices.remove(marker1)
+            break
+        else:
+            continue
+    if num_players == 2:
+        name2 = input("To Player B: please enter your name")
+    else:
+        name2 = 'computer'
+    marker2 = markerchoices[0]
+    return name1,name2,marker1,marker2,num_players
 
 # CHOOSE WHICH PLAYER GOES FIRST
 def choose_first(player1,player2):
@@ -97,15 +127,20 @@ def space_check(board, position):
         return False
     
 
-# VERIFY PLAYER MOVE CAN BE CURRENTLY PLAYED 
-def player_choice(board,player,pos_vacancy):
+def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players):
     '''
     ----explanation----
-    this function calls the player_input function, which takes/verifies the input as integer 1-9. 
+    in a 1 player game, on the computer's turn, this will call 'computer_choice' function ...
+    otherwise, this function calls the player_input function, which takes/verifies the input as integer 1-9. 
     once a valid integer is returned, this function verifies that the position is currently available for use. 
     
     '''
-    position = 'wrong'    # Criteria #1 to maintain While-Loop: 
+    if player['name'] == 'computer':
+        position = computer_choice(board,marker1,marker2)
+        vacancy = True
+        return position
+    else:
+        position = 'wrong'    # Criteria #1 to maintain While-Loop: 
     
     while position == 'wrong' or vacancy == False:    
         position = player_input(player,pos_vacancy)
@@ -128,6 +163,83 @@ def player_choice(board,player,pos_vacancy):
     # _______________  
     return position
 
+def computer_choice(board,marker1,marker2):
+    # STATICS
+    winningcombos = [[1,2,3],[1,4,7],[1,5,9],[4,5,6],[2,5,8],[3,5,7],[7,8,9],[3,6,9]]
+    player1positions = [j for j, x in enumerate(board) if x == marker1]
+    player2positions = [j for j, x in enumerate(board) if x == marker2]
+    vacantpositions = [j for j, x in enumerate(board) if x == ' ']
+
+    # LOGIC
+
+    comboindex = []
+    for combo in winningcombos:
+        sum_p1,sum_p2,sum_open = 0,0,0
+        vacancies = []
+        for p in player1positions:
+            sum_p1 += sum(i==p for i in combo)
+        for p in player2positions:
+            sum_p2 += sum(i==p for i in combo)
+        for p in vacantpositions:
+            sum_open += sum(i==p for i in combo)
+            if p in combo:
+                vacancies.append(p)
+
+        comboindex.append((combo,sum_p1,sum_p2,sum_open,vacancies))
+        #print("combo:",combo,"\tsum_p1:",sum_p1,"\tsum_p2:",sum_p2,"\tsum_open:",sum_open,"\tvacancies:",vacancies)
+
+    defense = []
+    offense = []
+    for (a,b,c,d,e) in comboindex:
+        if b == 0 and c == 0:
+            for p in e:
+                offense.append(p)
+        elif b >= 1 and c == 0:
+            for p in e:
+                defense.append(p)
+        elif b == 0 and c >= 1:
+            for p in e:
+                offense.append(p)   
+        else:
+            pass
+    #print("defense:\t",defense)
+    #print("offense:\t",offense)
+
+    options = []
+    for p in vacantpositions:
+        count_offense = sum(p==i for i in offense)
+        count_defense = sum(p==i for i in defense)
+        scoring = count_offense + count_defense
+
+        options.append([p,count_offense,count_defense,scoring])
+
+    rankings = []
+    for [i,j,k,rank] in options:
+        x = 0
+        if j >= 1 and k >= 1:
+            x += 1
+        else:
+            pass
+        for (a,b,c,d,e) in comboindex:
+            if i in e:
+                if b==2 and c==0:
+                    x += 2
+                elif b==0 and c==2:
+                    x += 3
+                else:
+                    pass
+            else:
+                pass
+        newrank = rank + x
+        rankings.append((i,newrank))
+
+    rankings.sort(key=lambda x:x[1])
+    #print("Rankings list:\t",rankings)
+    choice1 = rankings[-1][0]
+    choice2 = rankings[-2][0]
+    choice = random.choice([choice1,choice1,choice2])
+    #print("Computer chooses:\t",choice)
+    return choice
 
 # PERFORM PLAYER MOVE ONTO THE GAME BOARD
 def place_marker(board, marker, position):     
@@ -194,3 +306,13 @@ def replay():
         else:
             x_temp = False
     return x_temp
+
+def determine_victor(player1,player2):
+    if player1['score'] == player2['score']:
+        return ("Draw","The game has ended in a tie!")
+    elif player1['score'] > player2['score']:
+        return (player1,f"Victory goes to {player1['name']} (symbol '{player1['marker']}')! \t Final score {player1['score']} vs. {player2['score']}.")
+    elif player1['score'] < player2['score']:
+        return (player2,f"Victory goes to {player2['name']} (symbol '{player2['marker']}')! \t Final score {player2['score']} vs. {player1['score']}.")
+    else:
+        pass
