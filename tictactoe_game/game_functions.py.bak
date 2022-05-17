@@ -165,13 +165,6 @@ def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players):
     return position
 
 def computer_choice(board,marker1,marker2):
-    '''
-    This function is the decision algorithm for the computer player to derive their best move.
-    1. Every winning combination is examined for opportunities and threats.
-    2. Then a list of defensive and offensive opportunities is created.
-    3. Next, offensive and defensive opportunities are cross-examined for mutual overlap.
-    4. Last, a scoring system is applied to deduce the most preferable move by the above factors.
-    '''
     # STATICS
     winningcombos = [[1,2,3],[1,4,7],[1,5,9],[4,5,6],[2,5,8],[3,5,7],[7,8,9],[3,6,9]]
     player1positions = [j for j, x in enumerate(board) if x == marker1]
@@ -243,16 +236,9 @@ def computer_choice(board,marker1,marker2):
 
     rankings.sort(key=lambda x:x[1])
     #print("Rankings list:\t",rankings)
-    
-    if len(rankings) > 1:
-        # choice1 is the computer's best move. choice2 is the second-best.
-        # to reduce difficulty, there is only a 2:1 probability that the computer selects the best move.
-        choice1 = rankings[-1][0]
-        choice2 = rankings[-2][0]
-        choice = random.choice([choice1,choice1,choice2])
-    else:
-        choice1 = rankings[-1][0]
-        choice = choice1
+    choice1 = rankings[-1][0]
+    choice2 = rankings[-2][0]
+    choice = random.choice([choice1,choice1,choice2])
     #print("Computer chooses:\t",choice)
     return choice
 

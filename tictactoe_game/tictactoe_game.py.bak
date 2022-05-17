@@ -45,7 +45,7 @@ while game_on == True:
         
         # _______ Each Turn  _________________   
         
-        #print(name2,player2,marker2,name1,player1,marker1,player,marker)
+        print(name2,player2,marker2,name1,player1,marker1,player,marker)
         position = player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players)
         #position = player_choices(board,player,pos_vacancy,marker,marker1,marker2,num_players)
         
