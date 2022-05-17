@@ -1,3 +1,4 @@
+#(BRANCH new-single-player-feature) functions version b-1 
 from IPython.display import clear_output
 import random
 
@@ -15,9 +16,7 @@ def clear_output_new():
 
 # PRINT GAME BOARD
 def display_board(board):
-    #row1 = board[1:4]
-    #row2 = board[4:7]
-    #row3 = board[7:10]
+    # This function prints the current state of the game board.
     print(f"\n\t|| {board[1]} | {board[2]} | {board[3]} ||")
     print("\t||-----------||")
     print(f"\t|| {board[4]} | {board[5]} | {board[6]} ||")
@@ -25,18 +24,14 @@ def display_board(board):
     print(f"\t|| {board[7]} | {board[8]} | {board[9]} ||\n")
     
 def display_score(player1,player2):
+    # print the current score of each player.
     print(f"\t SCORE: \n\t - {player1['name']}: {player1['score']}\n\t - {player2['name']}: {player2['score']}\n")
 
 
 # PLAYER SETUP 
 def intro_players():
     '''
-    I chose to allow any marker symbol; Official solution restricted to X or O.
-    This could be made as such using default state and while loop,
-    e.g., 
-    > marker1 = '?' 
-    > while not (marker1 == 'X' or marker1 == 'O')
-    >     marker1 = input(...)   etc.
+    This function asks the player(s) to specify single/two-player game, their names, and desired marker symbol.
     '''
     num_players = 'unknown'
     num_confirm = False
@@ -52,7 +47,6 @@ def intro_players():
         # if integer, give chance to change answer.
         elif num_players.isdigit() == True:
             confirm = input(f"You've chosen a {num_players} player game. \n\t Please confirm? (y or n)")
-            #confirm = 'y'  #temporary, to avoid confirmation screen
             if confirm == 'n':
                 print("Enter another number (1 or 2)")
                 continue
@@ -79,9 +73,16 @@ def intro_players():
     return name1,name2,marker1,marker2,num_players
 
 # CHOOSE WHICH PLAYER GOES FIRST
-def choose_first(player1,player2):
-    
-    return random.choice([player1,player2])
+def choose_first(player1,player2,num_players):
+    '''
+    This function uses the random library to select which player takes the first turn.
+    In a two-player game, the players have 1:1 odds of taking the first turn.
+    In a single-player game, to reduce difficulty, the human player has 2:1 odds in favor of taking first turn.
+    '''
+    if num_players == 1:
+        return random.choice([player1,player1,player2]) 
+    else:
+        return random.choice([player1,player2])
 
 
 # PLAYER CHOOSES THEIR MOVE

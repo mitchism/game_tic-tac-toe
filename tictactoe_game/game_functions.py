@@ -16,9 +16,7 @@ def clear_output_new():
 
 # PRINT GAME BOARD
 def display_board(board):
-    #row1 = board[1:4]
-    #row2 = board[4:7]
-    #row3 = board[7:10]
+    # This function prints the current state of the game board.
     print(f"\n\t|| {board[1]} | {board[2]} | {board[3]} ||")
     print("\t||-----------||")
     print(f"\t|| {board[4]} | {board[5]} | {board[6]} ||")
@@ -26,18 +24,14 @@ def display_board(board):
     print(f"\t|| {board[7]} | {board[8]} | {board[9]} ||\n")
     
 def display_score(player1,player2):
+    # print the current score of each player.
     print(f"\t SCORE: \n\t - {player1['name']}: {player1['score']}\n\t - {player2['name']}: {player2['score']}\n")
 
 
 # PLAYER SETUP 
 def intro_players():
     '''
-    I chose to allow any marker symbol; Official solution restricted to X or O.
-    This could be made as such using default state and while loop,
-    e.g., 
-    > marker1 = '?' 
-    > while not (marker1 == 'X' or marker1 == 'O')
-    >     marker1 = input(...)   etc.
+    This function asks the player(s) to specify single/two-player game, their names, and desired marker symbol.
     '''
     num_players = 'unknown'
     num_confirm = False
@@ -53,7 +47,6 @@ def intro_players():
         # if integer, give chance to change answer.
         elif num_players.isdigit() == True:
             confirm = input(f"You've chosen a {num_players} player game. \n\t Please confirm? (y or n)")
-            #confirm = 'y'  #temporary, to avoid confirmation screen
             if confirm == 'n':
                 print("Enter another number (1 or 2)")
                 continue
@@ -80,9 +73,16 @@ def intro_players():
     return name1,name2,marker1,marker2,num_players
 
 # CHOOSE WHICH PLAYER GOES FIRST
-def choose_first(player1,player2):
-    
-    return random.choice([player1,player2])
+def choose_first(player1,player2,num_players):
+    '''
+    This function uses the random library to select which player takes the first turn.
+    In a two-player game, the players have 1:1 odds of taking the first turn.
+    In a single-player game, to reduce difficulty, the human player has 2:1 odds in favor of taking first turn.
+    '''
+    if num_players == 1:
+        return random.choice([player1,player1,player2]) 
+    else:
+        return random.choice([player1,player2])
 
 
 # PLAYER CHOOSES THEIR MOVE
@@ -165,6 +165,13 @@ def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players):
     return position
 
 def computer_choice(board,marker1,marker2):
+    '''
+    This function is the decision algorithm for the computer player to derive their best move.
+    1. Every winning combination is examined for opportunities and threats.
+    2. Then a list of defensive and offensive opportunities is created.
+    3. Next, offensive and defensive opportunities are cross-examined for mutual overlap.
+    4. Last, a scoring system is applied to deduce the most preferable move by the above factors.
+    '''
     # STATICS
     winningcombos = [[1,2,3],[1,4,7],[1,5,9],[4,5,6],[2,5,8],[3,5,7],[7,8,9],[3,6,9]]
     player1positions = [j for j, x in enumerate(board) if x == marker1]
@@ -236,9 +243,16 @@ def computer_choice(board,marker1,marker2):
 
     rankings.sort(key=lambda x:x[1])
     #print("Rankings list:\t",rankings)
-    choice1 = rankings[-1][0]
-    choice2 = rankings[-2][0]
-    choice = random.choice([choice1,choice1,choice2])
+    
+    if len(rankings) > 1:
+        # choice1 is the computer's best move. choice2 is the second-best.
+        # to reduce difficulty, there is only a 2:1 probability that the computer selects the best move.
+        choice1 = rankings[-1][0]
+        choice2 = rankings[-2][0]
+        choice = random.choice([choice1,choice1,choice2])
+    else:
+        choice1 = rankings[-1][0]
+        choice = choice1
     #print("Computer chooses:\t",choice)
     return choice
 

@@ -24,7 +24,7 @@ player1 = {'name':name1,'marker':marker1,'score':0}
 player2 = {'name':name2,'marker':marker2,'score':0}
 
 # ------ randomly pick first player  
-player = choose_first(player1,player2)    # ---- "choose_first" /  designates player1 or player2 as "player"
+player = choose_first(player1,player2,num_players)    # ---- "choose_first" /  designates player1 or player2 as "player"
 marker = player['marker']                 # ---- assign current player's marker (re-assigned each turn)
 
 clear_output_new()
@@ -45,7 +45,7 @@ while game_on == True:
         
         # _______ Each Turn  _________________   
         
-        print(name2,player2,marker2,name1,player1,marker1,player,marker)
+        #print(name2,player2,marker2,name1,player1,marker1,player,marker)
         position = player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players)
         #position = player_choices(board,player,pos_vacancy,marker,marker1,marker2,num_players)
         
