@@ -21,7 +21,6 @@ setup(
     url="https://github.com/mitchism/tictactoe_by_msm",
     packages=find_packages(),
     install_requires=requirements,
-
     project_urls={  # Optional
         "project GitHub": "https://github.com/mitchism/tictactoe_by_msm",
         "author url": "http://mitchellsmiller.weebly.com/",
@@ -35,7 +34,6 @@ setup(
         "Programming Language :: Python :: 3.9.7",
     ],
     keywords="Tic-Tac-Toe, Tic Tac Toe, Single player, Game, Console Game, Text based game",  # Optional
-    packages=setuptools.find_packages(),
     #package_dir={"": "tictactoe_game"},  
     #packages=find_packages(where="tictactoe_game"),
     python_requires=">=3.7, <4",
