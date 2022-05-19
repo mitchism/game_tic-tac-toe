@@ -10,7 +10,7 @@ requirements = ["ipython"]
 
 setup(
     name="tictactoe-by-msm",
-    version="1.4.0a1", 
+    version="1.4.0a2", 
     #ver 1.3.1.2 first stable alpha iteration
     #ver 1.4 upon merge of single player feature branch
     author="Mitch Miller",
