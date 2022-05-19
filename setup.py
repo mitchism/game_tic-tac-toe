@@ -6,7 +6,7 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 readme = (here / "README.md").read_text(encoding="utf-8")
 
-requirements = ["IPython"]
+requirements = ["ipython"]
 
 setup(
     name="tictactoe-by-msm",
