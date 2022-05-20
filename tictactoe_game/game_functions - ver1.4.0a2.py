@@ -1,4 +1,4 @@
-#(BRANCH wrapped game script ver1.4.1a)
+#(BRANCH wrapped game script ver1.4.2a)
 from IPython.display import clear_output
 import random
 
@@ -27,34 +27,16 @@ def display_score(player1,player2):
     # print the current score of each player.
     print(f"\t SCORE: \n\t - {player1['name']}: {player1['score']}\n\t - {player2['name']}: {player2['score']}\n")
 
-def decorator_for_intros(x):
-    def wrapped_func(mode='default'):
-        if mode == 'default':
-            print("default game mode. commencing default intro function.")
-            name1,name2,marker1,marker2,num_players = x()
-            return name1,name2,marker1,marker2,num_players
-            
-        elif mode == 'diag':
-            print("diagnostic mode. Game now single-player, generic player names config.") 
-            name1 = 'player1'
-            name2 = 'computer'
-            marker1 = 'X'
-            marker2 = 'O'
-            num_players = 1
-            return name1,name2,marker1,marker2,num_players
-            
-        else:
-            print("else; passing...")
-            pass
-    
-    return wrapped_func
+def get_position_data(board):
+    pos_vacancy = [j for j, x in enumerate(board) if x == ' ']
+    pos_occupancy = [j for j, x in enumerate(board) if x in {'X','O'}]
+    return pos_vacancy,pos_occupancy
 
 # PLAYER SETUP 
-
-@decorator_for_intros
 def intro_players():
-    # This function asks the player(s) to specify single/two-player game, their names, and desired marker symbol.
-    
+    '''
+    This function asks the player(s) to specify single/two-player game, their names, and desired marker symbol.
+    '''
     num_players = 'unknown'
     num_confirm = False
 
@@ -353,52 +335,3 @@ def determine_victor(player1,player2):
         return (player2,f"Victory goes to {player2['name']} (symbol '{player2['marker']}')! \t Final score {player2['score']} vs. {player1['score']}.")
     else:
         pass
-        
-
-def get_position_data(board):
-    pos_vacancy = [j for j, x in enumerate(board) if x == ' ']
-    pos_occupancy = [j for j, x in enumerate(board) if x in {'X','O'}]
-    return pos_vacancy,pos_occupancy
-
-def decorator_for_load(x):
-    def wrapped_func(mode='default',**kwargs):
-        
-        if mode == 'default':
-            print("default game mode. returning values from default load function.")
-            board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ = x()
-            return board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ
-            
-        elif mode == 'diag':
-            board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ = x()
-            for key, value in kwargs.items():
-                if key == 'board':
-                    board = value
-                    pos_vacancy,pos_occupancy = get_position_data(board)
-                    # next count number of positions to determine where the turn cycle is
-                elif key == 'player'
-                    player = value
-                    marker = player['marker']
-                    #
-                else:
-                    pass 
-            winstatus,wincount = win_check(board,marker)
-            return board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ
-            
-        else:
-            print("else; passing...")
-            pass
-    
-    return wrapped_func    
-
-@decorator_for_load
-def load_defaults():
-    # ____ Load the defaults _____
-    board = ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']    # Empty Board
-    game_on = True
-    match_on = True
-    pos_occupancy = []
-    pos_vacancy = [1,2,3,4,5,6,7,8,9]
-    winstatus = False
-    replayQ = None
-    return board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ
-    
