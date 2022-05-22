@@ -1,3 +1,4 @@
+'''
 def decorator_for_launch(x):
     def wrapped_func(**kwargs):
         if mode == 'default':
@@ -17,17 +18,19 @@ def decorator_for_launch(x):
             print("else; passing...")
             pass
     return wrapped_func
-
+'''
 #(BRANCH wrapped game script ver1.4.1a)
-@decorator_for_launch
-def launch_game(mode='default'):
+#@decorator_for_launch
+def launch_game(mode='default',**testconfig):
     from game_functions import clear_output_new,display_board,display_score,intro_players
     from game_functions import choose_first,player_input,space_check,player_choice,place_marker
     from game_functions import full_board_check,win_check,replay,determine_victor
-    from game_functions import computer_choice,decorator_for_intros,get_position_data
+    from game_functions import computer_choice,get_position_data,load_defaults
+    from game_functions import decorator_for_intros,decorator_for_load,recheck_player
+
     print('Welcome to Tic Tac Toe!')
 
-    '''
+    ''' # No longer loading defaults here, we want this AFTER intro_players
     # ____ Load the defaults _____
     board = ['#', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']    # Empty Board
     game_on = True
@@ -39,22 +42,30 @@ def launch_game(mode='default'):
     '''
 
     # _______ Player Setup  __________ 
-
-    #mode='default'
-    #mode='diag'
-
     # ------ player introduction 
     name1,name2,marker1,marker2,num_players = intro_players(mode)
-    #name1,name2,marker1,marker2,num_players = intro_players(mode='diag')
+    ''' 
+    # intro_players is a decorated function, only prompts if mode left to default, mode='default'
+    # if game is launched with mode='diag', the decorator auto-responds and intro_players gives no prompt
+    '''
     player1 = {'name':name1,'marker':marker1,'score':0}
     player2 = {'name':name2,'marker':marker2,'score':0}
 
-    # NOW load the defaults!!!
-    board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ = load_defaults(mode,**testconfig)
-    
-
     # ------ randomly pick first player  
-    player = choose_first(player1,player2,num_players)    # ---- "choose_first" /  designates player1 or player2 as "player"
+    player = choose_first(player1,player2,num_players,mode)    # ---- "choose_first" /  designates player1 or player2 as "player"
+
+    # NEW! load the defaults here, after intro_players and choose_first
+    board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ = load_defaults(mode,**testconfig)
+    ''' 
+    # load_defaults is a decorated function, takes standard defaults at first... 
+    # ...but overwrites board & pos_occupancy if they are provided in the testconfig
+    '''
+    # NEW! if test config starts this mid-game, we want to adjust the current turn correctly 
+    player,winstatus,match_on = recheck_player(mode,player,player1,player2,board,pos_occupancy)
+
+    # PYTHON DEBUGGER - TEMPORARY
+    import pdb; pdb.set_trace()
+
     marker = player['marker']                 # ---- assign current player's marker (re-assigned each turn)
 
     clear_output_new()
@@ -67,22 +78,27 @@ def launch_game(mode='default'):
     print(f"\n\tThe player chosen to move first is {player['name']} (symbol '{marker}') \n")
 
     # __________ Game continuity __________ 
-    while game_on == True:   
+    while game_on == True:
        
         # __________ Match continuity  __________ 
-
+        # NOTE: -- maybe below clause needs to be "while..." and the following 'elif' becomes 'if'
         if match_on == True and len(pos_vacancy) > 0:          # loop until a win, or until board full 
-            
+
+
             # _______ Each Turn  _________________   
             
             #print(name2,player2,marker2,name1,player1,marker1,player,marker)
-            position = player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players)
+            position = player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players,winstatus)
             #position = player_choices(board,player,pos_vacancy,marker,marker1,marker2,num_players)
             
             if position == 'quit':                              
                 match_on = False
                 game_on = False
                 break
+            elif position == 'pre-win': # TESTING CLAUSE - TEMPORARY
+                match_on = False # TESTING CLAUSE - TEMPORARY
+                game_on = False # TESTING CLAUSE - TEMPORARY
+                break # TESTING CLAUSE - TEMPORARY
             else:
                 pass
             
@@ -196,3 +212,11 @@ def launch_game(mode='default'):
     elif winstatus == False and game_on == False:   # this won't occur because the previous condition matches first anyways
         # test
         print("no win, end of match, gameon false")
+
+if __name__ == "__main__":
+   #launch_game(mode='default')
+   boardx = ['#', 'O', ' ', ' ', 'O', ' ', ' ', 'O', ' ', ' ']    # Empty Board
+   launch_game(mode='diag',board=boardx)
+
+else:
+   print("Failure to launch")

@@ -95,16 +95,28 @@ def intro_players():
     return name1,name2,marker1,marker2,num_players
 
 # CHOOSE WHICH PLAYER GOES FIRST
-def choose_first(player1,player2,num_players):
+def choose_first(player1,player2,num_players,mode):
     '''
     This function uses the random library to select which player takes the first turn.
     In a two-player game, the players have 1:1 odds of taking the first turn.
     In a single-player game, to reduce difficulty, the human player has 2:1 odds in favor of taking first turn.
     '''
-    if num_players == 1:
-        return random.choice([player1,player1,player2]) 
-    else:
+    
+    if mode == 'default':
+        if num_players == 1:
+            return random.choice([player1,player1,player2])
+            #player = random.choice([player1,player1,player2]) 
+            #marker = player['marker']
+            #return player
+        else:
+            return random.choice([player1,player2])
+            #player = random.choice([player1,player2])
+            #marker = player['marker']
+            #return player
+    elif mode == 'diag':
+        # NOTE - we might need a function to check if diag configuration is mid-game (doesnt need choice) or not
         return random.choice([player1,player2])
+        #pass
 
 
 # PLAYER CHOOSES THEIR MOVE
@@ -130,7 +142,7 @@ def player_input(player,pos_vacancy):
             #confirm = input(f"You've selected {choice}.\n\t Confirm? (y or n)")
             confirm = 'y'  #temporary, to avoid confirmation screen
             if confirm == 'n':
-                print("Enter another number (1-9)")      
+                print("Enter another number (1-9)")
             else:
                 print(f"\n\tYou have selected: {choice}.")
                 confirmation = True    # CRITERIA #2 TO ESCAPE LOOP  
@@ -150,7 +162,7 @@ def space_check(board, position):
         return False
     
 
-def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players):
+def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players,winstatus):
     '''
     ----explanation----
     in a 1 player game, on the computer's turn, this will call 'computer_choice' function ...
@@ -162,6 +174,10 @@ def player_choice(board,player,pos_vacancy,marker,marker1,marker2,num_players):
         position = computer_choice(board,marker1,marker2)
         vacancy = True
         return position
+    elif winstatus == True:  # TESTING CLAUSE - TEMPORARY
+        position = 'pre-win' # TESTING CLAUSE - TEMPORARY
+        vacancy = True # TESTING CLAUSE - TEMPORARY
+        return position # TESTING CLAUSE - TEMPORARY
     else:
         position = 'wrong'    # Criteria #1 to maintain While-Loop: 
     
@@ -360,6 +376,58 @@ def get_position_data(board):
     pos_occupancy = [j for j, x in enumerate(board) if x in {'X','O'}]
     return pos_vacancy,pos_occupancy
 
+def recheck_player(mode,player,player1,player2,board,pos_occupancy):
+    if mode == 'diag':
+        if len(pos_occupancy) > 0:
+            p1positions = [j for j, x in enumerate(board) if x == player1['marker']]
+            p2positions = [j for j, x in enumerate(board) if x == player2['marker']]
+            if len(p1positions) > len(p2positions):
+                player = player2
+                marker = player['marker']
+                winstatus,wincount = win_check(board,marker)
+                if winstatus == True:
+                    match_on = False
+                    return player,winstatus,match_on
+                else:
+                    match_on = True
+                    return player,winstatus,match_on
+                #winstatus,wincount = win_check(board,marker)
+                #return player,winstatus
+            elif len(p2positions) > len(p1positions):
+                player = player1
+                marker = player['marker']
+                winstatus,wincount = win_check(board,marker)
+                if winstatus == True:
+                    match_on = False
+                    return player,winstatus,match_on
+                else:
+                    match_on = True
+                    return player,winstatus,match_on
+                
+
+                
+            else: #len(p1positions) == len(p2positions):
+                marker = player['marker']
+                winstatus,wincount = win_check(board,marker)
+                if winstatus == True:
+                    match_on = False
+                    return player,winstatus,match_on
+                else:
+                    match_on = True
+                    return player,winstatus,match_on
+                
+                #winstatus,wincount = win_check(board,marker)
+                #return player,winstatus
+            
+        else:
+            winstatus = False
+            match_on = True
+            return player,winstatus,match_on
+    else:
+        winstatus = False
+        match_on = True
+        return player,winstatus,match_on
+
 def decorator_for_load(x):
     def wrapped_func(mode='default',**kwargs):
         
@@ -369,24 +437,16 @@ def decorator_for_load(x):
             return board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ
             
         elif mode == 'diag':
+            # begin with standard values of defaults
             board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ = x()
+            
+            # now replace standard defaults with any specified in testconfig 
             for key, value in kwargs.items():
                 if key == 'board':
                     board = value
                     pos_vacancy,pos_occupancy = get_position_data(board)
-                    # next count number of positions to determine where the turn cycle is
-                elif key == 'player'
-                    '''
-                    This clause is unnecessary, since given a board configuration,
-                    we should instead derive who the current player is based on 
-                    the respective number of "turns" appearing on the board at this time.
-                    '''
-                    player = value
-                    marker = player['marker']
-                    #
                 else:
-                    pass 
-            winstatus,wincount = win_check(board,marker)
+                    pass
             return board,game_on,match_on,pos_occupancy,pos_vacancy,winstatus,replayQ
             
         else:
