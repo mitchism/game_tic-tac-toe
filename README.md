@@ -1,8 +1,7 @@
 # game_tic-tac-toe
-Tic-Tac-Toe game constructed in python by Mitch Miller
+Tic-Tac-Toe game constructed in python by Mitch Miller. Can be played by two human players, but also features a **single-player game mode in which the computer plays against you**. The computer player is programmed to derive the best possible position to play on each turn, simultaneously considering each position for offensive and defensive – then selects the position which provides the ideal compromise between disrupting your strategy while advancing its own.
 
-Add new feature: to **play a single-player game against the computer**!
-Add new function "computer_choice", which is the decision algorithm for the computer player to derive their best move. 
+
 ### Computer Decision Logic
 The computer player's decision tree deduces the best move by the following logic: 
 
